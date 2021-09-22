@@ -9,12 +9,16 @@ from api.coronatech.companies.models import Company
 
 
 companies_url = reverse("companies-list")
-pytestmark = pytest.mark.django_db  # this mark requests db access - creates new empty database for tests
+pytestmark = (
+    pytest.mark.django_db
+)  # this mark requests db access - creates new empty database for tests
+
 
 def test_zero_companies_should_return_empty_list(client) -> None:
     response = client.get(companies_url)
     assert response.status_code == 200
     assert json.loads(response.content) == []
+
 
 def test_one_company_exists_should_succeed(client) -> None:
     test_company = Company.objects.create(name="ESA")
@@ -41,7 +45,10 @@ def test_create_existing_company_should_fail(client) -> None:
         data={"name": "ESA"},
     )
     assert response.status_code == 400
-    assert json.loads(response.content) == {"name": ["company with this name already exists."]}
+    assert json.loads(response.content) == {
+        "name": ["company with this name already exists."]
+    }
+
 
 def test_create_company_with_only_name_all_fields_should_be_default(client) -> None:
     response = client.post(path=companies_url, data={"name": "N7Space"})
@@ -52,6 +59,7 @@ def test_create_company_with_only_name_all_fields_should_be_default(client) -> N
     assert response_content.get("application_link") == ""
     assert response_content.get("notes") == ""
 
+
 def test_create_company_with_layoffs_should_succeed(client) -> None:
     response = client.post(
         path=companies_url, data={"name": "N7Space", "status": "Layoffs"}
@@ -59,6 +67,7 @@ def test_create_company_with_layoffs_should_succeed(client) -> None:
     assert response.status_code == 201
     response_content = json.loads(response.content)
     assert response_content.get("status") == "Layoffs"
+
 
 def test_create_company_with_wrong_status_should_fail(client) -> None:
     response = client.post(
@@ -68,18 +77,22 @@ def test_create_company_with_wrong_status_should_fail(client) -> None:
     assert "Test Status" in str(response.content)
     assert "is not a valid choice" in str(response.content)
 
+
 @pytest.mark.xfail
 def test_should_fails_which_is_ok() -> None:
     assert 1 == 2
+
 
 @pytest.mark.skip
 def test_should_be_skipped() -> None:
     assert 2 == 2
 
+
 # testing error rising
 def raises_value_error_should_pass() -> None:
     if 2 > 1:
         raise AssertionError("2 should be bigger than 1")
+
 
 def test_raises_value_error_should_pass() -> None:
     with pytest.raises(AssertionError) as e:

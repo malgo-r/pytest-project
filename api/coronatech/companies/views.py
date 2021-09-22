@@ -17,12 +17,19 @@ class CompanyViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
 
 
-@api_view(http_method_names=['POST'])
-def send_company_email(request:Request) -> Response:
+@api_view(http_method_names=["POST"])
+def send_company_email(request: Request) -> Response:
     """
     Send enami with request payload
     sender: malgor.test@gmail.com
     receiver: malgor.test@gmail.com
     """
-    send_mail(subject=request.data.get("subject"), message=request.data.get("message"), from_email="malgor.test@gmail.com", recipient_list=["malgor.test@gmail.com"])
-    return Response({"status": "success", "info": "email sent successfully"}, status=200)
+    send_mail(
+        subject=request.data.get("subject"),
+        message=request.data.get("message"),
+        from_email="malgor.test@gmail.com",
+        recipient_list=["malgor.test@gmail.com"],
+    )
+    return Response(
+        {"status": "success", "info": "email sent successfully"}, status=200
+    )
